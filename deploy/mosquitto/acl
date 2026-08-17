@@ -1,0 +1,6 @@
+user smartcareos-app
+topic read smartcare/+/devices/+/risk-events
+topic read $SYS/broker/uptime
+
+user device-button-e2e-001
+topic write smartcare/integration-tenant/devices/button-e2e-001/risk-events

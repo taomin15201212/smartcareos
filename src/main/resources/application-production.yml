@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    url: ${SMARTCAREOS_DB_URL}
+    username: ${SMARTCAREOS_DB_USERNAME}
+    password: ${SMARTCAREOS_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${SMARTCAREOS_DB_POOL_MAX:20}
+      minimum-idle: ${SMARTCAREOS_DB_POOL_MIN:5}
+      connection-timeout: 5000
+      validation-timeout: 3000
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:127.0.0.1}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+    publisher-confirm-type: correlated
+    template:
+      mandatory: true
+
+server:
+  port: ${SMARTCAREOS_HTTP_PORT:8080}
+  compression:
+    enabled: true
+  error:
+    include-message: never
+    include-stacktrace: never
+
+smartcareos:
+  api-docs:
+    enabled: ${SMARTCAREOS_API_DOCS_ENABLED:false}
+  security:
+    enabled: true
+    bootstrap-key: ${SMARTCAREOS_BOOTSTRAP_API_KEY:}
+    bootstrap-tenant: ${SMARTCAREOS_BOOTSTRAP_TENANT:}
+    bootstrap-principal: ${SMARTCAREOS_BOOTSTRAP_PRINCIPAL:bootstrap}
+  outbox:
+    enabled: ${SMARTCAREOS_OUTBOX_ENABLED:false}
+
+logging:
+  pattern:
+    level: "%5p [requestId:%X{requestId:-}]"

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SmartCareOS · Architecture Atlas</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>.inspector.collapsed{display:none}.workspace:has(.inspector.collapsed){grid-template-columns:1fr}</style>
+</head>
+<body>
+  <div class="shell" data-screen-label="SmartCareOS 架构全景">
+    <aside class="rail">
+      <a class="brand" href="#" aria-label="SmartCareOS 架构全景">
+        <span class="brand-mark"><i></i><i></i><i></i></span>
+        <span><b>SmartCare</b><small>ARCHITECTURE ATLAS</small></span>
+      </a>
+
+      <div class="rail-label">架构视图</div>
+      <nav id="views" aria-label="架构视图">
+        <button class="nav-item active" data-view="business"><span class="nav-icon">⌘</span><span>业务全景</span><em>01</em></button>
+        <button class="nav-item" data-view="application"><span class="nav-icon">▦</span><span>应用与领域</span><em>02</em></button>
+        <button class="nav-item" data-view="flow"><span class="nav-icon">↝</span><span>数据与消息</span><em>03</em></button>
+        <button class="nav-item" data-view="deployment"><span class="nav-icon">◇</span><span>部署与安全</span><em>04</em></button>
+      </nav>
+
+      <div class="rail-label">治理视角</div>
+      <button class="utility active" data-toggle="fact"><span class="dot fact"></span>来源事实<span class="switch"><i></i></span></button>
+      <button class="utility active" data-toggle="inference"><span class="dot inference"></span>架构推演<span class="switch"><i></i></span></button>
+
+      <div class="rail-foot">
+        <div class="pulse"><span></span></div>
+        <div><b>Architecture 1.0</b><small>更新于 2026.08.17</small></div>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <div class="breadcrumb">企业架构资产库 <span>/</span> <b id="breadcrumb">业务全景</b></div>
+          <h1 id="page-title">智慧养老业务全景</h1>
+          <p id="page-subtitle">从服务对象到能力中台，查看 SmartCareOS 的业务边界与价值链。</p>
+        </div>
+        <div class="top-actions">
+          <button class="ghost" id="chain-btn"><span>↝</span> 聚焦核心链路</button>
+          <button class="primary" id="export-btn"><span>↓</span> 导出架构摘要</button>
+        </div>
+      </header>
+
+      <section class="summary-strip">
+        <div><span>运行状态</span><b class="healthy"><i></i> 双实例健康</b></div>
+        <div><span>领域上下文</span><b>8</b></div>
+        <div><span>数据模型</span><b>Schema V10</b></div>
+        <div><span>自动化测试</span><b>39 / 39</b></div>
+        <div><span>发布版本</span><b>1.0.0</b></div>
+      </section>
+
+      <section class="workspace">
+        <div class="canvas-card">
+          <div class="canvas-toolbar">
+            <div class="legend">
+              <span><i class="fact"></i> 来源事实</span>
+              <span><i class="inference"></i> 架构推演</span>
+              <span><i class="live"></i> 已实现</span>
+              <span><i class="external"></i> 外部依赖</span>
+            </div>
+            <div class="canvas-meta"><span id="node-count">16 个能力节点</span><button id="reset-btn" title="重置视图">↻</button></div>
+          </div>
+          <div id="architecture-canvas" class="architecture-canvas"></div>
+        </div>
+
+        <aside class="inspector" data-screen-label="架构节点详情">
+          <div class="inspector-head"><span id="detail-index">01 / BUSINESS</span><button id="close-detail">×</button></div>
+          <div class="detail-icon" id="detail-icon">⌘</div>
+          <div class="detail-kicker" id="detail-kicker"><i class="fact"></i> 来源事实 · F-01</div>
+          <h2 id="detail-title">智慧养老服务网络</h2>
+          <p id="detail-desc">连接养老机构、社区、家庭与政府监管部门，形成覆盖“居住—照护—健康—安全”的协同服务网络。</p>
+
+          <div class="detail-section">
+            <h3>职责边界</h3>
+            <ul id="detail-bullets"></ul>
+          </div>
+          <div class="detail-section">
+            <h3>关键接口</h3>
+            <div class="chips" id="detail-interfaces"></div>
+          </div>
+          <div class="detail-section">
+            <h3>工程状态</h3>
+            <div class="status-row"><span id="detail-status-dot" class="status-dot complete"></span><b id="detail-status">已实现</b><small id="detail-owner">核心平台</small></div>
+          </div>
+          <div class="source-note" id="source-note"><b>事实依据</b><span>《招聘信息汇总.md》F-01</span></div>
+        </aside>
+      </section>
+
+      <section class="milestones" data-screen-label="交付里程碑">
+        <div class="section-heading">
+          <div><span>DELIVERY RADAR</span><h2>从架构资产到生产基线</h2></div>
+          <div class="progress-copy"><b>16 / 17</b><small>内部里程碑闭环</small></div>
+        </div>
+        <div class="timeline" id="timeline"></div>
+        <div class="milestone-note"><span class="status-dot sandbox"></span><b>M14 外部验收：</b>本地沙箱链路已完成，正式微信/短信、企业身份与政务环境仍依赖第三方凭据及契约。</div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SmartCareOS 运营中心</title><link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <main>
+    <header><div><p class="eyebrow">SMARTCARE OS</p><h1>智慧养老运营中心</h1><p>老人、设备、告警与护理协同的一站式工作台</p></div><span id="status" class="badge">尚未连接</span></header>
+    <section class="login card">
+      <label>租户<input id="tenant" placeholder="机构租户标识"></label>
+      <label>操作人<input id="principal" placeholder="账号标识"></label>
+      <label>访问密钥<input id="apiKey" type="password" placeholder="仅保存在当前浏览器会话"></label>
+      <button id="connect">连接工作台</button>
+    </section>
+    <section id="metrics" class="metrics" aria-live="polite"></section>
+    <section class="grid">
+      <article class="card"><h2>今日工作</h2><p>优先处理未闭环告警和进行中的护理任务，异常通知会单独提示。</p><button id="refresh" class="secondary">刷新数据</button></article>
+      <article class="card"><h2>安全提示</h2><p>工作台按机构隔离数据，并按角色限制操作。关闭页面后，访问密钥会自动清除。</p></article>
+    </section>
+  </main><script src="/app.js"></script>
+</body></html>

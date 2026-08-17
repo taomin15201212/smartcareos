@@ -1,0 +1,103 @@
+spring:
+  application:
+    name: smartcareos
+  datasource:
+    url: jdbc:h2:file:./data/smartcareos;MODE=MySQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: true
+
+server:
+  shutdown: graceful
+  forward-headers-strategy: framework
+
+springdoc:
+  api-docs:
+    enabled: ${smartcareos.api-docs.enabled}
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: ${smartcareos.api-docs.enabled}
+    path: /swagger-ui.html
+    display-request-duration: true
+    groups-order: asc
+    tags-sorter: alpha
+    operations-sorter: method
+
+management:
+  server:
+    port: ${SMARTCAREOS_MANAGEMENT_PORT:9090}
+    address: ${SMARTCAREOS_MANAGEMENT_ADDRESS:127.0.0.1}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  health:
+    rabbit:
+      enabled: false
+
+smartcareos:
+  api-docs:
+    enabled: ${SMARTCAREOS_API_DOCS_ENABLED:true}
+  security:
+    enabled: false
+    auth-mode: ${SMARTCAREOS_AUTH_MODE:api-key}
+    oidc:
+      issuer-uri: ${SMARTCAREOS_OIDC_ISSUER_URI:}
+    bootstrap-key: ${SMARTCAREOS_BOOTSTRAP_API_KEY:}
+    bootstrap-tenant: ${SMARTCAREOS_BOOTSTRAP_TENANT:}
+    bootstrap-principal: ${SMARTCAREOS_BOOTSTRAP_PRINCIPAL:bootstrap}
+  outbox:
+    enabled: false
+    batch-size: 100
+    fixed-delay: PT1S
+    lease: PT1M
+    base-backoff: PT2S
+    max-backoff: PT15M
+  mqtt:
+    enabled: ${SMARTCAREOS_MQTT_ENABLED:false}
+    server-uri: ${SMARTCAREOS_MQTT_SERVER_URI:tcp://127.0.0.1:1883}
+    client-id: ${SMARTCAREOS_MQTT_CLIENT_ID:smartcareos-${random.uuid}}
+    username: ${SMARTCAREOS_MQTT_USERNAME:}
+    password: ${SMARTCAREOS_MQTT_PASSWORD:}
+    connect-timeout: PT10S
+    tls:
+      trust-store: ${SMARTCAREOS_MQTT_TLS_TRUST_STORE:}
+      trust-store-password: ${SMARTCAREOS_MQTT_TLS_TRUST_STORE_PASSWORD:}
+      key-store: ${SMARTCAREOS_MQTT_TLS_KEY_STORE:}
+      key-store-password: ${SMARTCAREOS_MQTT_TLS_KEY_STORE_PASSWORD:}
+  rabbitmq:
+    confirm-timeout: PT5S
+
+---
+spring:
+  config:
+    activate:
+      on-profile: secure
+smartcareos:
+  security:
+    enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    url: ${SMARTCAREOS_DB_URL:jdbc:mysql://localhost:3306/smartcareos?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC}
+    username: ${SMARTCAREOS_DB_USERNAME:smartcareos}
+    password: ${SMARTCAREOS_DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver

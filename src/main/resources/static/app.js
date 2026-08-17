@@ -1,0 +1,6 @@
+const names={elders:'老人档案',activeDevices:'在线设备',openAlarms:'待闭环告警',pendingCareTasks:'待办护理',failedNotifications:'失败通知',pendingGovernmentExchanges:'待报送任务'};
+const ids=['tenant','principal','apiKey']; ids.forEach(id=>document.getElementById(id).value=sessionStorage.getItem(id)||'');
+function headers(){return {'X-SmartCare-Tenant':tenant.value,'X-SmartCare-Principal':principal.value,'X-SmartCare-Api-Key':apiKey.value}}
+async function load(){ids.forEach(id=>sessionStorage.setItem(id,document.getElementById(id).value));status.textContent='连接中…';status.className='badge';
+ try{const response=await fetch('/api/v1/dashboard/summary',{headers:headers()});if(!response.ok)throw new Error(response.status===401?'凭据无效':response.status===403?'当前角色无权访问':'服务暂不可用');const data=await response.json();metrics.innerHTML=Object.entries(names).map(([key,label])=>`<article class="metric ${key.includes('failed')||key.includes('Alarms')?'alert':''}"><span>${label}</span><strong>${data[key]}</strong></article>`).join('');status.textContent='已连接 · '+data.tenantId;status.className='badge ok'}catch(error){status.textContent=error.message;metrics.innerHTML=''}}
+connect.onclick=load;refresh.onclick=load;if(ids.every(id=>document.getElementById(id).value))load();

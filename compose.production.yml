@@ -1,0 +1,85 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: smartcareos
+      MYSQL_USER: smartcareos
+      MYSQL_PASSWORD: ${SMARTCAREOS_DB_PASSWORD:?set SMARTCAREOS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${SMARTCAREOS_DB_ROOT_PASSWORD:?set SMARTCAREOS_DB_ROOT_PASSWORD}
+    command: ["--character-set-server=utf8mb4","--collation-server=utf8mb4_0900_ai_ci"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL","mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${SMARTCAREOS_MQ_USERNAME:?set SMARTCAREOS_MQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${SMARTCAREOS_MQ_PASSWORD:?set SMARTCAREOS_MQ_PASSWORD}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD","rabbitmq-diagnostics","-q","ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./deploy/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./deploy/mosquitto/acl:/mosquitto/config/acl:ro
+      - ./deploy/mosquitto/certs:/mosquitto/config/certs:ro
+      - mosquitto-data:/mosquitto/data
+    healthcheck:
+      test: ["CMD-SHELL","mosquitto_sub -h 127.0.0.1 -p 8883 --cafile /mosquitto/config/certs/ca.crt --cert /mosquitto/config/certs/app.crt --key /mosquitto/config/certs/app.key -t '$$SYS/broker/uptime' -C 1 -W 3 >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    profiles: ["app"]
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      mosquitto:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: production,rabbitmq
+      SMARTCAREOS_DB_URL: jdbc:mysql://mysql:3306/smartcareos?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+      SMARTCAREOS_DB_USERNAME: smartcareos
+      SMARTCAREOS_DB_PASSWORD: ${SMARTCAREOS_DB_PASSWORD}
+      SMARTCAREOS_MANAGEMENT_ADDRESS: 0.0.0.0
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: ${SMARTCAREOS_MQ_USERNAME}
+      SPRING_RABBITMQ_PASSWORD: ${SMARTCAREOS_MQ_PASSWORD}
+      SMARTCAREOS_MQTT_SERVER_URI: ssl://mosquitto:8883
+      SMARTCAREOS_MQTT_TLS_TRUST_STORE: /app/mqtt-certs/truststore.p12
+      SMARTCAREOS_MQTT_TLS_TRUST_STORE_PASSWORD: ${SMARTCAREOS_MQTT_KEYSTORE_PASSWORD}
+      SMARTCAREOS_MQTT_TLS_KEY_STORE: /app/mqtt-certs/app-keystore.p12
+      SMARTCAREOS_MQTT_TLS_KEY_STORE_PASSWORD: ${SMARTCAREOS_MQTT_KEYSTORE_PASSWORD}
+      SMARTCAREOS_MQTT_ENABLED: "true"
+      SMARTCAREOS_OUTBOX_ENABLED: "true"
+      SMARTCAREOS_BOOTSTRAP_API_KEY: ${SMARTCAREOS_BOOTSTRAP_API_KEY:-}
+      SMARTCAREOS_BOOTSTRAP_TENANT: ${SMARTCAREOS_BOOTSTRAP_TENANT:-}
+    ports:
+      - "127.0.0.1:${SMARTCAREOS_HTTP_PORT:-8080}:8080"
+      - "127.0.0.1:${SMARTCAREOS_MANAGEMENT_PORT:-9090}:9090"
+    volumes:
+      - ./deploy/mosquitto/certs:/app/mqtt-certs:ro
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  rabbitmq-data:
+  mosquitto-data:

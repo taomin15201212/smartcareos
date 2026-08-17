@@ -1,0 +1,16 @@
+target/
+backups/
+dist/
+runtime/
+deploy/mosquitto/passwords
+deploy/mosquitto/certs/
+.env.production
+.env.integration
+.m2-repository/
+.idea/
+*.iml
+.DS_Store
+data/
+logs/
+*.log
+*.pid
